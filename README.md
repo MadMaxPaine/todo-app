@@ -94,12 +94,11 @@ dotnet run
 
 Backend runs on:
 
-* http://localhost:5000
-* https://localhost:5001
+* http://localhost:<port>
 
 Swagger:
 
-* https://localhost:5001/swagger
+* http://localhost:<port>/swagger
 
 ---
 
