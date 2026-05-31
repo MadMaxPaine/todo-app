@@ -1,0 +1,247 @@
+<div class="min-h-screen bg-gray-50 flex gap-6 p-6 font-sans">
+
+  <!-- SIDEBAR -->
+  <aside class="w-64 bg-white rounded-2xl shadow-md p-4 flex flex-col gap-3">
+
+    <!-- ACTIONS -->
+    <button
+      class="w-full bg-indigo-600 text-white py-2 rounded-xl font-medium hover:bg-indigo-700 transition"
+      (click)="openCreate()"
+    >
+      + Create Task
+    </button>
+
+    <button
+      class="w-full bg-gray-100 text-gray-800 py-2 rounded-xl font-medium hover:bg-gray-200 transition"
+      (click)="logout()"
+    >
+      Logout
+    </button>
+
+    <div class="h-px bg-gray-200 my-2"></div>
+
+    <!-- TITLE -->
+    <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+      Categories
+    </div>
+
+    <!-- FILTERS -->
+    <button
+      class="w-full text-left px-3 py-2 rounded-xl text-sm transition"
+      [ngClass]="selectedCategory === null
+        ? 'bg-indigo-600 text-white'
+        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'"
+      (click)="setFilter(null)"
+    >
+      All Tasks
+    </button>
+
+    <button
+      *ngFor="let cat of categories"
+      class="w-full text-left px-3 py-2 rounded-xl text-sm transition"
+      [ngClass]="selectedCategory === cat.id
+        ? 'bg-indigo-600 text-white'
+        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'"
+      (click)="setFilter(cat.id)"
+    >
+      {{ cat.name }}
+    </button>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 flex flex-col gap-6">
+
+    <!-- SEARCH -->
+    <section class="bg-white rounded-2xl shadow-md p-4">
+      <h2 class="text-sm font-semibold text-gray-600 mb-2">Search</h2>
+
+      <input
+        type="text"
+        placeholder="Search tasks..."
+        [(ngModel)]="search"
+        (ngModelChange)="onSearch($event)"
+        class="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+    </section>
+
+    <!-- TASK LIST -->
+    <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+      <div
+        *ngFor="let task of filteredTasks"
+        class="bg-white rounded-2xl shadow-md p-4 flex flex-col gap-2 hover:shadow-lg transition"
+      >
+
+        <h3 class="text-sm font-semibold break-words"
+            [ngClass]="task.isCompleted ? 'line-through opacity-50' : ''">
+          {{ task.title }}
+        </h3>
+
+        <p class="text-sm text-gray-600 break-words line-clamp-3">
+          {{ task.description }}
+        </p>
+
+        <span class="self-start text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700">
+          {{ task.categoryName || "No category" }}
+        </span>
+
+        <!-- ACTIONS -->
+        <div class="flex gap-2 flex-wrap mt-2">
+
+          <button
+            class="px-3 py-1 text-xs rounded-lg border hover:bg-gray-100 transition"
+            (click)="toggle(task)"
+          >
+            {{ task.isCompleted ? "Undo" : "Done" }}
+          </button>
+
+          <button
+            class="px-3 py-1 text-xs rounded-lg border hover:bg-gray-100 transition"
+            (click)="openEdit(task)"
+          >
+            Edit
+          </button>
+
+          <button
+            class="px-3 py-1 text-xs rounded-lg border text-red-600 hover:bg-red-50 transition"
+            (click)="deleteTask(task.id)"
+          >
+            Delete
+          </button>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PAGINATION -->
+    <div class="flex justify-center items-center gap-3">
+      <button
+        class="px-3 py-1 rounded-lg border hover:bg-gray-100"
+        (click)="prevPage()"
+        [disabled]="page === 1"
+      >
+        Prev
+      </button>
+
+      <span class="text-sm text-gray-600">
+        {{ page }}
+      </span>
+
+      <button
+        class="px-3 py-1 rounded-lg border hover:bg-gray-100"
+        (click)="nextPage()"
+        [disabled]="page * pageSize >= totalCount"
+      >
+        Next
+      </button>
+    </div>
+
+  </main>
+</div>
+
+<!-- CREATE MODAL -->
+<div
+  *ngIf="isCreateOpen"
+  class="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
+  (click)="closeCreate()"
+>
+
+  <div
+    class="bg-white w-full max-w-md rounded-2xl p-5 flex flex-col gap-3"
+    (click)="$event.stopPropagation()"
+  >
+
+    <h2 class="text-lg font-semibold">Create Task</h2>
+
+    <input
+      class="border rounded-xl px-3 py-2"
+      [(ngModel)]="title"
+      placeholder="Title"
+    />
+
+    <textarea
+      class="border rounded-xl px-3 py-2"
+      [(ngModel)]="description"
+      placeholder="Description"
+    ></textarea>
+
+    <select class="border rounded-xl px-3 py-2" [(ngModel)]="categoryId">
+      <option [ngValue]="null">No category</option>
+      <option *ngFor="let cat of categories" [ngValue]="cat.id">
+        {{ cat.name }}
+      </option>
+    </select>
+
+    <div class="flex justify-end gap-2">
+      <button
+        class="px-3 py-2 rounded-xl bg-indigo-600 text-white"
+        (click)="createTask(); closeCreate()"
+      >
+        Create
+      </button>
+
+      <button
+        class="px-3 py-2 rounded-xl bg-gray-200"
+        (click)="closeCreate()"
+      >
+        Cancel
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div
+  *ngIf="isEditOpen && editingTask"
+  class="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
+  (click)="closeEdit()"
+>
+
+  <div
+    class="bg-white w-full max-w-md rounded-2xl p-5 flex flex-col gap-3"
+    (click)="$event.stopPropagation()"
+  >
+
+    <h2 class="text-lg font-semibold">Edit Task</h2>
+
+    <input
+      class="border rounded-xl px-3 py-2"
+      [(ngModel)]="editingTask.title"
+    />
+
+    <textarea
+      class="border rounded-xl px-3 py-2"
+      [(ngModel)]="editingTask.description"
+    ></textarea>
+
+    <select
+      class="border rounded-xl px-3 py-2"
+      [(ngModel)]="editingTask.categoryId"
+    >
+      <option [ngValue]="null">No category</option>
+      <option *ngFor="let cat of categories" [ngValue]="cat.id">
+        {{ cat.name }}
+      </option>
+    </select>
+
+    <div class="flex justify-end gap-2">
+      <button
+        class="px-3 py-2 rounded-xl bg-indigo-600 text-white"
+        (click)="saveEdit()"
+      >
+        Save
+      </button>
+
+      <button
+        class="px-3 py-2 rounded-xl bg-gray-200"
+        (click)="closeEdit()"
+      >
+        Cancel
+      </button>
+    </div>
+
+  </div>
+</div>

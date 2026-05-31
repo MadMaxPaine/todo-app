@@ -1,0 +1,45 @@
+# =========================
+# BACKEND (.NET)
+# =========================
+**/bin/
+**/obj/
+**/out/
+**/logs/
+**/*.user
+**/*.suo
+**/*.cache
+**/*.db
+**/*.db-shm
+**/*.db-wal
+
+# EF Core
+**/Migrations/*Designer.cs
+
+# Secrets
+**/appsettings.Development.json
+**/appsettings.Local.json
+
+# Rider / VS
+.idea/
+.vs/
+*.DotSettings.user
+
+# =========================
+# FRONTEND (Angular)
+# =========================
+ToDoFrontEnd/node_modules/
+ToDoFrontEnd/dist/
+ToDoFrontEnd/.angular/
+ToDoFrontEnd/.cache/
+
+# environment files (якщо хочеш)
+ToDoFrontEnd/src/environments/*.local.ts
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
