@@ -91,7 +91,9 @@ dotnet ef database update
 ```bash
 dotnet run
 ```
-
+Backend runs on:
+* http://localhost:5261/api
+  
 Swagger:
 
 * http://localhost:<port>/swagger
