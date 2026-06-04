@@ -14,7 +14,15 @@ public class TaskRepository : ITaskRepository
         _context = context;
     }
 
+    
     public IQueryable<TaskItem> Query()
+    {
+        return _context.Tasks
+            .Include(t => t.Category);
+    }
+
+    
+    public IQueryable<TaskItem> QueryReadOnly()
     {
         return _context.Tasks
             .AsNoTracking()
@@ -30,7 +38,7 @@ public class TaskRepository : ITaskRepository
 
     public async Task Add(TaskItem task)
     {
-        _context.Tasks.Add(task);
+        await _context.Tasks.AddAsync(task);
         await _context.SaveChangesAsync();
     }
 
